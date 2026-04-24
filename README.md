@@ -68,7 +68,11 @@ cd claude-sounds
 bash scripts/install.sh
 ```
 
-That's it. **Restart Claude Code** and you'll hear sounds on every hook event.
+The installer will ask you to:
+1. Pick a theme
+2. Choose which events trigger sounds (multi-select, all enabled by default)
+
+**Restart Claude Code** and you'll hear sounds on every selected hook event.
 
 Want zero downloads (system sounds only)?
 
@@ -150,6 +154,13 @@ claude-sounds test
 
 # Switch theme
 claude-sounds theme zen
+
+# Choose which events trigger sounds (interactive toggle)
+claude-sounds events
+
+# Enable / disable specific events
+claude-sounds events off write bash      # no sound when writing files or running commands
+claude-sounds events on  write bash      # re-enable them
 
 # Adjust volume (0.0 – 1.0)
 claude-sounds volume 0.5

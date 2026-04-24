@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
     --help|-h)
       echo "Usage: install.sh [options]"
       echo "  --dry-run              Preview changes without applying"
-      echo "  --theme <name>         Set theme: minimal|forest|zen|retro|cafe"
+      echo "  --theme <name>         Set theme: minimal|forest|zen|retro|cafe|wuxia|cute|anime|space|hacker"
       echo "  --quiet-start <hour>   Silence start hour (0-23, e.g. 22)"
       echo "  --quiet-end <hour>     Silence end hour (0-23, e.g. 8)"
       echo "  --volume <0.0-1.0>     Playback volume (default: 0.7)"
