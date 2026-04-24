@@ -22,6 +22,12 @@ if [[ -f "$CONFIG_FILE" ]]; then
   source "$CONFIG_FILE"
 fi
 
+# ── Events filter ────────────────────────────────────────────
+EVENTS_ENABLED="${EVENTS_ENABLED:-start done permission subtask notify write bash error}"
+if ! echo " $EVENTS_ENABLED " | grep -q " $EVENT "; then
+  exit 0
+fi
+
 # ── Snooze check ──────────────────────────────────────────────
 if [[ -n "$SNOOZE_UNTIL" ]]; then
   now=$(date +%s)

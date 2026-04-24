@@ -27,6 +27,7 @@ THEME=""
 QUIET_START=""
 QUIET_END=""
 VOLUME=""
+EVENTS_ENABLED=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -114,6 +115,57 @@ select_theme() {
   esac
 }
 
+select_events() {
+  local _events=(start done permission subtask notify write bash error)
+  local _labels=(
+    "SessionStart       — new session opens"
+    "Stop               — task / response complete"
+    "PermissionRequest  — Claude asks to run a tool"
+    "SubagentStop       — subtask complete"
+    "Notification       — system notification"
+    "PostToolUse:Write  — file written or edited"
+    "PostToolUse:Bash   — shell command executed"
+    "PostToolUseFailure — tool call failed"
+  )
+  local _sel=(1 1 1 1 1 1 1 1)   # all on by default
+
+  while true; do
+    echo -e "\n${BOLD}Select events that trigger sounds:${NC}"
+    echo -e "  ${CYAN}(toggle by number · 'a' all · 'n' none · Enter to confirm)${NC}\n"
+    for i in "${!_events[@]}"; do
+      local mark=" "
+      [[ "${_sel[$i]}" == "1" ]] && mark="${GREEN}✓${NC}"
+      printf "  [%b] %d) %s\n" "$mark" "$((i+1))" "${_labels[$i]}"
+    done
+    echo -ne "\n  > "
+    read -r choice
+    case "$choice" in
+      "") break ;;
+      a)  _sel=(1 1 1 1 1 1 1 1) ;;
+      n)  _sel=(0 0 0 0 0 0 0 0) ;;
+      [1-8])
+        local idx=$(( choice - 1 ))
+        [[ "${_sel[$idx]}" == "1" ]] && _sel[$idx]=0 || _sel[$idx]=1
+        ;;
+      *)  # support space-separated e.g. "1 3 6"
+        for tok in $choice; do
+          [[ "$tok" =~ ^[1-8]$ ]] || continue
+          local idx=$(( tok - 1 ))
+          [[ "${_sel[$idx]}" == "1" ]] && _sel[$idx]=0 || _sel[$idx]=1
+        done
+        ;;
+    esac
+  done
+
+  EVENTS_ENABLED=""
+  for i in "${!_events[@]}"; do
+    [[ "${_sel[$i]}" == "1" ]] && EVENTS_ENABLED="$EVENTS_ENABLED ${_events[$i]}"
+  done
+  EVENTS_ENABLED="${EVENTS_ENABLED# }"
+  [[ -z "$EVENTS_ENABLED" ]] && EVENTS_ENABLED="done error"  # minimum fallback
+  echo -e "\n  ${GREEN}✓${NC} Events: $EVENTS_ENABLED"
+}
+
 install_theme() {
   local theme="$1"
   local theme_dir="$INSTALL_DIR/themes/$theme"
@@ -144,12 +196,18 @@ write_config() {
 
   mkdir -p "$INSTALL_DIR/themes/minimal"
 
+  local ev="${EVENTS_ENABLED:-start done permission subtask notify write bash error}"
+
   cat > "$INSTALL_DIR/config.sh" << CONF
 # claude-sounds configuration
 # Edit this file to customise your audio notifications
 
 THEME="${THEME}"
 VOLUME="${vol}"
+
+# Enabled events — space-separated list of events that trigger sounds
+# Options: start done permission subtask notify write bash error
+EVENTS_ENABLED="${ev}"
 
 # Quiet hours — silence during these hours (24h format)
 # Example: no sound from 22:00 to 08:00
@@ -268,6 +326,9 @@ install_scripts
 
 echo -e "\n${BOLD}Writing config:${NC}"
 write_config
+
+echo -e "\n${BOLD}Select events:${NC}"
+select_events
 
 echo -e "\n${BOLD}Installing sounds:${NC}"
 install_theme "$THEME"

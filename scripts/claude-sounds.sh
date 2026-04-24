@@ -24,6 +24,9 @@ ${BOLD}USAGE${NC}
 ${BOLD}COMMANDS${NC}
   test                    Play all sounds in sequence
   theme <name>            Switch theme (minimal|forest|zen|retro|cafe|wuxia|cute|anime|space|hacker)
+  events                  Interactive toggle: choose which events trigger sounds
+  events on  <e> [...]    Enable specific events  (e.g. events on done error)
+  events off <e> [...]    Disable specific events (e.g. events off write bash)
   volume <0.0-1.0>        Adjust playback volume
   snooze <minutes>        Silence notifications for N minutes
   snooze off              Cancel active snooze
@@ -98,6 +101,84 @@ cmd_theme() {
   save_config_value "THEME" "$theme"
   echo -e "${GREEN}✓ Theme switched to: $theme${NC}"
   echo "  Restart Claude Code to apply."
+}
+
+cmd_events() {
+  load_config
+  local all_events=(start done permission subtask notify write bash error)
+  local labels=(
+    "SessionStart       — new session opens"
+    "Stop               — task complete"
+    "PermissionRequest  — Claude asks permission"
+    "SubagentStop       — subtask complete"
+    "Notification       — system notification"
+    "PostToolUse:Write  — file written or edited"
+    "PostToolUse:Bash   — shell command executed"
+    "PostToolUseFailure — tool call failed"
+  )
+  local current="${EVENTS_ENABLED:-start done permission subtask notify write bash error}"
+
+  local subcmd="${1:-}"
+
+  # Non-interactive: events on / events off
+  if [[ "$subcmd" == "on" || "$subcmd" == "off" ]]; then
+    shift
+    local updated="$current"
+    for ev in "$@"; do
+      if [[ "$subcmd" == "on" ]]; then
+        echo " $updated " | grep -q " $ev " || updated="$updated $ev"
+      else
+        updated=$(echo " $updated " | sed "s/ $ev / /g" | xargs)
+      fi
+    done
+    updated="${updated# }"
+    [[ -z "$updated" ]] && updated="done error"
+    save_config_value "EVENTS_ENABLED" "$updated"
+    echo -e "${GREEN}✓ Events updated: $updated${NC}"
+    return
+  fi
+
+  # Interactive toggle
+  local sel=()
+  for ev in "${all_events[@]}"; do
+    echo " $current " | grep -q " $ev " && sel+=(1) || sel+=(0)
+  done
+
+  while true; do
+    echo -e "\n${BOLD}Event sounds (toggle · 'a' all · 'n' none · Enter confirm):${NC}\n"
+    for i in "${!all_events[@]}"; do
+      local mark=" "
+      [[ "${sel[$i]}" == "1" ]] && mark="${GREEN}✓${NC}"
+      printf "  [%b] %d) %s\n" "$mark" "$((i+1))" "${labels[$i]}"
+    done
+    echo -ne "\n  > "
+    read -r choice
+    case "$choice" in
+      "") break ;;
+      a) sel=(1 1 1 1 1 1 1 1) ;;
+      n) sel=(0 0 0 0 0 0 0 0) ;;
+      [1-8])
+        local idx=$(( choice - 1 ))
+        [[ "${sel[$idx]}" == "1" ]] && sel[$idx]=0 || sel[$idx]=1
+        ;;
+      *)
+        for tok in $choice; do
+          [[ "$tok" =~ ^[1-8]$ ]] || continue
+          local idx=$(( tok - 1 ))
+          [[ "${sel[$idx]}" == "1" ]] && sel[$idx]=0 || sel[$idx]=1
+        done
+        ;;
+    esac
+  done
+
+  local result=""
+  for i in "${!all_events[@]}"; do
+    [[ "${sel[$i]}" == "1" ]] && result="$result ${all_events[$i]}"
+  done
+  result="${result# }"
+  [[ -z "$result" ]] && result="done error"
+  save_config_value "EVENTS_ENABLED" "$result"
+  echo -e "\n${GREEN}✓ Events saved: $result${NC}"
 }
 
 cmd_volume() {
@@ -260,6 +341,7 @@ shift || true
 case "$CMD" in
   test)       cmd_test ;;
   theme)      cmd_theme "$@" ;;
+  events)     cmd_events "$@" ;;
   volume)     cmd_volume "$@" ;;
   snooze)     cmd_snooze "$@" ;;
   quiet)      cmd_quiet "$@" ;;
