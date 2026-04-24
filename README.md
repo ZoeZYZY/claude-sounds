@@ -8,16 +8,16 @@ Know when Claude finishes, asks for permission, or hits an error — without wat
 ```
 $ claude-sounds test
 
-  SessionStart      ✓  forest/start.wav        🌲
-  Stop              ✓  forest/done.wav          🐦
-  PermissionRequest ✓  forest/permission.wav   🐱
-  SubagentStop      ✓  forest/subtask.wav      🎋
-  Notification      ✓  forest/notify.wav       🔔
-  PostToolUse:Write ✓  forest/write.wav         💧
-  PostToolUse:Bash  ✓  forest/bash.wav          🌊
-  PostToolUseError  ✓  forest/error.wav         🪨
+  SessionStart      ✓  wuxia/start.wav        🥁  deep gong
+  Stop              ✓  wuxia/done.wav          🎵  guqin pluck
+  PermissionRequest ✓  wuxia/permission.wav   🔔  alert chirp
+  SubagentStop      ✓  wuxia/subtask.wav      🎵  short pluck
+  Notification      ✓  wuxia/notify.wav       🔔  small bell
+  PostToolUse:Write ✓  wuxia/write.wav        🗡️  sword swish
+  PostToolUse:Bash  ✓  wuxia/bash.wav         🥁  drum hit
+  PostToolUseError  ✓  wuxia/error.wav        🪨  low gong
 
-  8/8 events OK  •  theme: forest  •  volume: 0.6
+  8/8 events OK  •  theme: wuxia  •  volume: 0.6
 ```
 
 </p>
@@ -99,12 +99,23 @@ Switch themes anytime with `claude-sounds theme <name>`.
 | Theme | Description | Size |
 |-------|-------------|------|
 | `minimal` | macOS / Windows system sounds | 0 KB — zero files |
-| `forest` 🌲 | Bird chirps, wind, nature tones | ~430 KB bundled |
-| `zen` 🎋 | Singing bowls, water drops, bells | ~430 KB bundled |
-| `retro` 🕹️ | 8-bit chiptune alerts | ~130 KB bundled |
-| `cafe` ☕ | Warm muted tones, coffee-shop feel | ~430 KB bundled |
+| `forest` 🌲 | Bird chirps, wind, nature tones | ~60 KB bundled |
+| `zen` 🎋 | Singing bowls, water drops, bells | ~60 KB bundled |
+| `retro` 🕹️ | 8-bit chiptune alerts | ~30 KB bundled |
+| `cafe` ☕ | Warm muted tones, coffee-shop feel | ~60 KB bundled |
+| `wuxia` 🗡️ | Deep gong, plucked strings, sword swish | ~80 KB bundled |
+| `cute` 🌸 | Bubble pops, sparkles, cartoon boing | ~40 KB bundled |
+| `anime` ✨ | Power-up sweeps, magic chimes, whoosh | ~50 KB bundled |
+| `voice` 💋 | Sultry English voice lines (macOS) | generated locally |
+| `voice-cute` 🎀 | Chipper English voice lines (macOS) | generated locally |
 
-All themes are **bundled in the repo** — no downloads needed. Sounds are original CC0 synthesized audio.
+All synthesized themes are **bundled in the repo** — no downloads needed. Voice themes are generated locally using your macOS built-in TTS.
+
+**Voice themes (macOS only):**
+```bash
+bash scripts/generate_voice_theme.sh           # sexy / Samantha voice
+bash scripts/generate_voice_theme.sh --cute    # cute / high-pitched voice
+```
 
 **Custom sounds:** drop any `.mp3` / `.wav` file into `~/.claude/sounds/themes/my-theme/` and run `claude-sounds theme my-theme`.
 
