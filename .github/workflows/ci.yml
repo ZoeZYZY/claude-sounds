@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-shell:
+    name: Shell syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell scripts
+        run: |
+          bash -n scripts/install.sh
+          bash -n scripts/play.sh
+          bash -n scripts/claude-sounds.sh
+          bash -n themes/MANIFEST.sh
+          echo "All shell scripts OK"
+
+  lint-powershell:
+    name: PowerShell syntax check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PowerShell scripts
+        shell: pwsh
+        run: |
+          $scripts = @("scripts/Install-ClaudeSounds.ps1", "scripts/play.ps1")
+          foreach ($s in $scripts) {
+            $null = [System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $s), [ref]$null, [ref]$null
+            )
+            Write-Host "$s OK"
+          }

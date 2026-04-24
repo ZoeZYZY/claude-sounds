@@ -4,7 +4,22 @@
 Know when Claude finishes, asks for permission, or hits an error — without watching the terminal.
 
 <p align="center">
-  <img src="docs/demo.gif" alt="demo" width="680"/>
+
+```
+$ claude-sounds test
+
+  SessionStart      ✓  forest/start.wav        🌲
+  Stop              ✓  forest/done.wav          🐦
+  PermissionRequest ✓  forest/permission.wav   🐱
+  SubagentStop      ✓  forest/subtask.wav      🎋
+  Notification      ✓  forest/notify.wav       🔔
+  PostToolUse:Write ✓  forest/write.wav         💧
+  PostToolUse:Bash  ✓  forest/bash.wav          🌊
+  PostToolUseError  ✓  forest/error.wav         🪨
+
+  8/8 events OK  •  theme: forest  •  volume: 0.6
+```
+
 </p>
 
 <p align="center">
