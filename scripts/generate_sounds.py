@@ -445,6 +445,256 @@ def generate_anime():
     print(f"  ✓ anime ({len(os.listdir(d))} files)")
 
 
+# ──────────────────────────────────────────────────────────────
+# Space primitives 🚀  (NASA aesthetic, synthesized CC0)
+# ──────────────────────────────────────────────────────────────
+
+def make_cosmic_drone(filename, freq=55, duration=1.8, sample_rate=44100, volume=0.32):
+    """Deep space drone — slow LFO modulation on a low sine."""
+    frames = []
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        lfo = 1 + 0.04 * math.sin(2 * math.pi * 0.6 * t)
+        fade_in  = min(1.0, t * 3)
+        fade_out = min(1.0, (duration - t) * 3)
+        env = fade_in * fade_out
+        val = _clamp(volume * 32767 * env * (
+            0.6 * math.sin(2 * math.pi * freq * lfo * t) +
+            0.3 * math.sin(2 * math.pi * freq * 2 * lfo * t) +
+            0.1 * math.sin(2 * math.pi * freq * 3.02 * lfo * t)
+        ))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_comms_beep(filename, freq=1200, sample_rate=44100, volume=0.36):
+    """NASA-style radio confirmation beep — clean and precise."""
+    frames = []
+    for dur in [0.08, 0.08]:          # two short tones
+        n = int(sample_rate * dur)
+        for i in range(n):
+            t = i / sample_rate
+            env = min(1.0, t * 60) * min(1.0, (dur - t) * 60)
+            val = _clamp(volume * 32767 * env * math.sin(2 * math.pi * freq * t))
+            frames.append(struct.pack('<h', val))
+        frames.extend([struct.pack('<h', 0)] * int(sample_rate * 0.05))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_mission_complete(filename, sample_rate=44100, volume=0.36):
+    """Ascending three-tone mission-complete chord."""
+    frames = []
+    for freq in [523, 659, 784]:       # C5, E5, G5
+        dur = 0.18
+        n = int(sample_rate * dur)
+        for i in range(n):
+            t = i / sample_rate
+            env = math.sin(math.pi * t / dur) ** 0.6
+            val = _clamp(volume * 32767 * env * (
+                0.7 * math.sin(2 * math.pi * freq * t) +
+                0.3 * math.sin(2 * math.pi * freq * 2 * t)
+            ))
+            frames.append(struct.pack('<h', val))
+        frames.extend([struct.pack('<h', 0)] * int(sample_rate * 0.03))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_thruster(filename, sample_rate=44100, volume=0.26):
+    """Short thruster burst — filtered noise with low rumble."""
+    frames = []
+    duration = 0.3
+    n = int(sample_rate * duration)
+    prev = 0.0
+    for i in range(n):
+        t = i / sample_rate
+        env = math.sin(math.pi * t / duration) ** 0.7
+        raw = random.random() * 2 - 1
+        # simple low-pass: blend with previous sample
+        filtered = 0.15 * raw + 0.85 * prev
+        prev = filtered
+        rumble = math.sin(2 * math.pi * 48 * t) * 0.4
+        val = _clamp(volume * 32767 * env * (filtered + rumble))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_data_ping(filename, freq=1800, sample_rate=44100, volume=0.34):
+    """Short digital ping — data transmission feel."""
+    frames = []
+    duration = 0.12
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        env = math.exp(-t * 18)
+        val = _clamp(volume * 32767 * env * math.sin(2 * math.pi * freq * t))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_space_alert(filename, sample_rate=44100, volume=0.35):
+    """Two-tone descending warning — proximity alert."""
+    frames = []
+    for freq in [880, 660]:
+        dur = 0.14
+        n = int(sample_rate * dur)
+        for i in range(n):
+            t = i / sample_rate
+            env = math.sin(math.pi * t / dur) ** 0.8
+            val = _clamp(volume * 32767 * env * math.sin(2 * math.pi * freq * t))
+            frames.append(struct.pack('<h', val))
+        frames.extend([struct.pack('<h', 0)] * int(sample_rate * 0.04))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_warp_sweep(filename, sample_rate=44100, volume=0.3):
+    """Warp/hyperspace entry sweep — fast ascending noise."""
+    frames = []
+    duration = 0.4
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        freq = 100 + 3000 * (t / duration) ** 2
+        env = (t / duration) * math.exp(-max(0, t - 0.3) * 20)
+        noise = random.random() * 2 - 1
+        tone = math.sin(2 * math.pi * freq * t)
+        val = _clamp(volume * 32767 * env * (0.4 * noise + 0.6 * tone))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+# ──────────────────────────────────────────────────────────────
+# Hacker primitives 💻  (terminal / matrix aesthetic)
+# ──────────────────────────────────────────────────────────────
+
+def make_boot_seq(filename, sample_rate=44100, volume=0.30):
+    """System boot — ascending digital tones with gaps."""
+    frames = []
+    freqs = [220, 330, 440, 660, 880]
+    for freq in freqs:
+        dur = 0.055
+        n = int(sample_rate * dur)
+        for i in range(n):
+            t = i / sample_rate
+            sq = 1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0
+            env = min(1.0, t * 80) * min(1.0, (dur - t) * 80)
+            val = _clamp(volume * 32767 * env * sq)
+            frames.append(struct.pack('<h', val))
+        frames.extend([struct.pack('<h', 0)] * int(sample_rate * 0.025))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_access_granted(filename, sample_rate=44100, volume=0.30):
+    """Access granted — rising two-tone square wave."""
+    frames = []
+    for freq in [440, 880]:
+        dur = 0.12
+        n = int(sample_rate * dur)
+        for i in range(n):
+            t = i / sample_rate
+            sq = 1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0
+            env = min(1.0, t * 40) * math.exp(-max(0, t - 0.08) * 30)
+            val = _clamp(volume * 32767 * env * sq)
+            frames.append(struct.pack('<h', val))
+        frames.extend([struct.pack('<h', 0)] * int(sample_rate * 0.03))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_keyclick(filename, sample_rate=44100, volume=0.28):
+    """Mechanical keyboard click — sharp noise transient."""
+    frames = []
+    duration = 0.06
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        env = math.exp(-t * 60)
+        noise = random.random() * 2 - 1
+        click = math.sin(2 * math.pi * 3200 * t) * math.exp(-t * 80)
+        val = _clamp(volume * 32767 * (env * noise * 0.5 + click * 0.5))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_terminal_ping(filename, sample_rate=44100, volume=0.32):
+    """Terminal bell — classic BEL character sound."""
+    frames = []
+    duration = 0.2
+    freq = 880
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        env = math.exp(-t * 12)
+        sq = 1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0
+        val = _clamp(volume * 32767 * env * sq)
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_access_denied(filename, sample_rate=44100, volume=0.32):
+    """Access denied — harsh descending buzz."""
+    frames = []
+    duration = 0.45
+    n = int(sample_rate * duration)
+    for i in range(n):
+        t = i / sample_rate
+        freq = 520 - 280 * (t / duration)
+        env = math.exp(-t * 4)
+        sq = 1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0
+        val = _clamp(volume * 32767 * env * sq * 0.6)
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+def make_data_stream(filename, sample_rate=44100, volume=0.22):
+    """Data stream — rapid noise burst, like bits flowing."""
+    frames = []
+    duration = 0.18
+    n = int(sample_rate * duration)
+    prev = 0.0
+    for i in range(n):
+        t = i / sample_rate
+        env = math.sin(math.pi * t / duration) ** 0.5
+        raw = random.random() * 2 - 1
+        filtered = 0.3 * raw + 0.7 * prev
+        prev = filtered
+        tone = math.sin(2 * math.pi * 1200 * t) * 0.3
+        val = _clamp(volume * 32767 * env * (filtered + tone))
+        frames.append(struct.pack('<h', val))
+    _write_wav(filename, frames, sample_rate)
+
+
+# ──────────────────────────────────────────────────────────────
+# Theme generators (continued)
+# ──────────────────────────────────────────────────────────────
+
+def generate_space():
+    d = os.path.join(THEMES_DIR, "space")
+    os.makedirs(d, exist_ok=True)
+    make_cosmic_drone(f"{d}/start.wav")                        # deep space entry
+    make_mission_complete(f"{d}/done.wav")                     # C-E-G mission complete
+    make_space_alert(f"{d}/permission.wav")                    # two-tone alert
+    make_comms_beep(f"{d}/notify.wav")                         # radio confirmation
+    make_data_ping(f"{d}/write.wav")                           # data transmission
+    make_thruster(f"{d}/bash.wav")                             # thruster burst
+    make_warp_sweep(f"{d}/subtask.wav")                        # warp jump
+    make_comms_beep(f"{d}/error.wav", freq=440)                # low error beep
+    print(f"  ✓ space ({len(os.listdir(d))} files)")
+
+
+def generate_hacker():
+    d = os.path.join(THEMES_DIR, "hacker")
+    os.makedirs(d, exist_ok=True)
+    make_boot_seq(f"{d}/start.wav")                            # system boot
+    make_access_granted(f"{d}/done.wav")                       # access granted
+    make_terminal_ping(f"{d}/permission.wav")                  # terminal bell
+    make_terminal_ping(f"{d}/notify.wav")                      # softer ping
+    make_keyclick(f"{d}/write.wav")                            # key click
+    make_data_stream(f"{d}/bash.wav")                          # data stream
+    make_access_granted(f"{d}/subtask.wav")                    # short confirm
+    make_access_denied(f"{d}/error.wav")                       # access denied
+    print(f"  ✓ hacker ({len(os.listdir(d))} files)")
+
+
 if __name__ == "__main__":
     print("Generating theme sounds...")
     generate_zen()
@@ -454,5 +704,7 @@ if __name__ == "__main__":
     generate_wuxia()
     generate_cute()
     generate_anime()
+    generate_space()
+    generate_hacker()
     print("\nDone. All sounds written to themes/")
     print("Tip: run 'bash scripts/generate_voice_theme.sh' to generate the voice theme (macOS only)")

@@ -106,6 +106,8 @@ Switch themes anytime with `claude-sounds theme <name>`.
 | `wuxia` 🗡️ | Deep gong, plucked strings, sword swish | ~80 KB bundled |
 | `cute` 🌸 | Bubble pops, sparkles, cartoon boing | ~40 KB bundled |
 | `anime` ✨ | Power-up sweeps, magic chimes, whoosh | ~50 KB bundled |
+| `space` 🚀 | Cosmic drone, NASA-style comms beeps, thruster | ~60 KB bundled |
+| `hacker` 💻 | Boot sequence, keyclick, access granted/denied | ~30 KB bundled |
 | `voice` 💋 | Sultry English voice lines (macOS) | generated locally |
 | `voice-cute` 🎀 | Chipper English voice lines (macOS) | generated locally |
 
