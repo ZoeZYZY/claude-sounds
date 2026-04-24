@@ -23,7 +23,7 @@ ${BOLD}USAGE${NC}
 
 ${BOLD}COMMANDS${NC}
   test                    Play all sounds in sequence
-  theme <name>            Switch theme (minimal|forest|zen|retro|cafe)
+  theme <name>            Switch theme (minimal|forest|zen|retro|cafe|wuxia|cute|anime|space|hacker)
   volume <0.0-1.0>        Adjust playback volume
   snooze <minutes>        Silence notifications for N minutes
   snooze off              Cancel active snooze
@@ -75,11 +75,11 @@ cmd_test() {
 cmd_theme() {
   local theme="${1:-}"
   if [[ -z "$theme" ]]; then
-    echo "Available themes: minimal forest zen retro cafe"
+    echo "Available themes: minimal forest zen retro cafe wuxia cute anime space hacker voice voice-cute"
     return
   fi
   case "$theme" in
-    minimal|forest|zen|retro|cafe) ;;
+    minimal|forest|zen|retro|cafe|wuxia|cute|anime|space|hacker|voice|voice-cute) ;;
     *) echo -e "${RED}Unknown theme: $theme${NC}"; exit 1 ;;
   esac
 
