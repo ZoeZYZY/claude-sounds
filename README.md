@@ -19,7 +19,7 @@ Know when Claude finishes, asks for permission, or hits an error — without wat
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=flat-square"/>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square"/>
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"/>
-  <img src="https://img.shields.io/github/stars/YOUR_USERNAME/claude-sounds?style=flat-square"/>
+  <img src="https://img.shields.io/github/stars/ZoeZYZY/claude-sounds?style=flat-square"/>
 </p>
 
 ---
@@ -48,7 +48,7 @@ Claude Code is great for long agentic tasks — but you end up glancing at the t
 ### macOS / Linux
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/claude-sounds.git
+git clone https://github.com/ZoeZYZY/claude-sounds.git
 cd claude-sounds
 bash scripts/install.sh
 ```
@@ -64,7 +64,7 @@ bash scripts/install.sh --theme minimal
 ### Windows
 
 ```powershell
-git clone https://github.com/YOUR_USERNAME/claude-sounds.git
+git clone https://github.com/ZoeZYZY/claude-sounds.git
 cd claude-sounds
 .\scripts\Install-ClaudeSounds.ps1
 ```
@@ -72,7 +72,7 @@ cd claude-sounds
 ### One-liner (macOS/Linux, minimal theme)
 
 ```bash
-curl -sL https://raw.githubusercontent.com/YOUR_USERNAME/claude-sounds/main/scripts/install.sh | bash -s -- --theme minimal
+curl -sL https://raw.githubusercontent.com/ZoeZYZY/claude-sounds/main/scripts/install.sh | bash -s -- --theme minimal
 ```
 
 ---
